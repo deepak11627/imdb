@@ -22,19 +22,12 @@ func NewMovieHandler(s resources.MovieService) *MovieHandler {
 }
 
 func (m *MovieHandler) Handle(res http.ResponseWriter, req *http.Request) {
-	var head string
-	head, req.URL.Path = ShiftPath(req.URL.Path)
-	id, err := strconv.Atoi(head)
-	if err != nil {
-		http.Error(res, fmt.Sprintf("Invalid movie id %q", head), http.StatusBadRequest)
-		return
-	}
 
 	switch req.Method {
 	case "GET":
-		m.handleGet(id, res, req)
+		m.handleGet(res, req)
 	case "PUT":
-		m.handlePut(id, res, req)
+		m.handlePut(res, req)
 	case "POST":
 		m.handlePost(res, req)
 	default:
@@ -42,14 +35,43 @@ func (m *MovieHandler) Handle(res http.ResponseWriter, req *http.Request) {
 	}
 }
 
-func (mh *MovieHandler) handleGet(id int, res http.ResponseWriter, req *http.Request) {
-
+type movieResponse struct {
+	ID       int     `json:"id"`
+	Name     string  `json:"name,omitempty"`
+	Score    float32 `json:"imdb_score,omitempty"`
+	Director string  `json:"director,omitempty"`
 }
-func (mh *MovieHandler) handlePut(id int, res http.ResponseWriter, req *http.Request) {
-}
 
-type newMovieResponse struct {
-	ID int `json:"id"`
+func (mh *MovieHandler) handleGet(res http.ResponseWriter, req *http.Request) {
+	var head string
+	head, req.URL.Path = ShiftPath(req.URL.Path)
+	id, err := strconv.Atoi(head)
+	if err != nil {
+		http.Error(res, fmt.Sprintf("Invalid movie id %q", head), http.StatusBadRequest)
+		return
+	}
+	m, err := mh.service.GetMovie(id)
+	if err != nil {
+		r, _ := jsonResponse(errorResponse{Code: strconv.Itoa(http.StatusInternalServerError), Errors: []string{err.Error()}})
+		res.Write(r)
+		return
+	}
+	r, err := jsonResponse(movieResponse{ID: m.ID, Name: m.Name, Score: m.Score, Director: m.Director})
+	if err != nil {
+		mh.logger.Warn("failed to create movie json response", "error", err)
+		return
+	}
+	res.Write(r)
+}
+func (mh *MovieHandler) handlePut(res http.ResponseWriter, req *http.Request) {
+	var head string
+	head, req.URL.Path = ShiftPath(req.URL.Path)
+	_, err := strconv.Atoi(head)
+	if err != nil {
+		http.Error(res, fmt.Sprintf("Invalid movie id %q", head), http.StatusBadRequest)
+		return
+	}
+
 }
 
 func (mh *MovieHandler) handlePost(res http.ResponseWriter, req *http.Request) {
@@ -69,7 +91,7 @@ func (mh *MovieHandler) handlePost(res http.ResponseWriter, req *http.Request) {
 		res.Write(r)
 		return
 	}
-	r, err := jsonResponse(newMovieResponse{ID: id})
+	r, err := jsonResponse(movieResponse{ID: id})
 	if err != nil {
 		mh.logger.Warn("failed to create movie json response", "error", err)
 		return

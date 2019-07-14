@@ -2,13 +2,14 @@ package db
 
 import (
 	"database/sql"
+	"errors"
 
 	"github.com/deepak11627/imdb/resources"
 )
 
 type DatabaseService interface {
 	CreateMovie(name, director string, genre []string, score float32) (int, error)
-	SaveMovie(ID int, name, director string, genre []string, score float32) (int, error)
+	SaveMovie(ID int, name, director string, genre []string, score float32) error
 	GetMovie(id int) (*resources.Movie, error)
 }
 
@@ -25,56 +26,45 @@ func NewDB(db *sql.DB) *Database {
 }
 
 func (d *Database) CreateMovie(name, director string, genre []string, score float32) (int, error) {
-	stmt, err := d.db.Prepare("INSERT INTO `movie` (`name`, `director`, `score`) VALUES (?, ?, ?)")
+
+	stmt, err := d.db.Prepare("INSERT INTO `movie` (`name`, `director_name`, `imdb_score`) VALUES (?, ?, ?)")
 	if err != nil {
-		return nil, err
+		return 0, err
 	}
+	defer stmt.Close()
 
 	result, err := stmt.Exec(name, director, score)
 	if err != nil {
-		return nil, err
+		return 0, err
 	}
 
 	lastInsertedID, err := result.LastInsertId()
 	if err != nil {
-		return nil, err
+		return 0, err
 	}
-	return lastInsertedID,nil
+	return int(lastInsertedID), nil
 }
 
-func (d *Database) SaveMovie(id int, name, director string, genre []string, score float32) (int, error) {
-	stmt, err := d.db.Prepare("UPDATE `movie` SET `name` = ?, ")
+func (d *Database) SaveMovie(id int, name, director string, genre []string, score float32) error {
+	stmt, err := d.db.Prepare("UPDATE movie SET name=?, director_name=?, imdb_score=? WHERE id=?")
 	if err != nil {
-		return nil, err
+		return err
 	}
-
-	result, err := stmt.Exec(name, director, score)
-	if err != nil {
-		return nil, err
+	defer stmt.Close()
+	if _, err = stmt.Exec(name, director, score, id); err != nil {
+		return err
 	}
-
-	lastInsertedID, err := result.LastInsertId()
-	if err != nil {
-		return nil, err
-	}
-	return lastInsertedID,nil
+	return nil
 }
 
 func (d *Database) GetMovie(id int) (*resources.Movie, error) {
-	stmt, err := d.db.QueryRow("SELECT * FROM `movie` WHERE `id` = ?")
-	if err != nil {
-		return nil, err
+	row := d.db.QueryRow("SELECT `id`, `name`, `director_name`, `imdb_score` FROM `movie` WHERE `id` = ?", id)
+	if row != nil {
+		m := new(resources.Movie)
+		if err := row.Scan(m.ID, m.Name, m.Director, m.Score); err != nil {
+			return nil, err
+		}
+		return m, nil
 	}
-
-	result, err := stmt.Exec(name, director, score)
-	if err != nil {
-		return nil, err
-	}
-
-	lastInsertedID, err := result.LastInsertId()
-	if err != nil {
-		return nil, err
-	}
-	return lastInsertedID,nil
-	return &resources.Movie{ID: id}, nil
+	return nil, errors.New("not found")
 }

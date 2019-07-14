@@ -18,7 +18,6 @@ type Handler struct {
 	// h.MovieHandler.ServeHTTP to the correct definition. The disadvantage is
 	// that we have slightly stronger coupling.
 	MovieHandler *MovieHandler
-	//MiddleWares  []middlewares.MiddleWare
 }
 
 // NewHandler returns the Custom Hanlder type

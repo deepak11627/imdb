@@ -19,6 +19,6 @@ type Review struct {
 // MovieService represents Movie DB operations
 type MovieService interface {
 	CreateMovie(name, director string, genre []string, score float32) (int, error)
-	SaveMovie(ID int, name, director string, genre []string, score float32) (int, error)
+	SaveMovie(ID int, name, director string, genre []string, score float32) error
 	GetMovie(id int) (*Movie, error)
 }
