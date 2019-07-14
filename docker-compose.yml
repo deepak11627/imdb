@@ -11,6 +11,8 @@ services:
       - MYSQL_DATABASE=imdb
     ports:
       - "3307:3306"
+    
+  # TODO use webapp in container
   # webapp:
   #   build:
   #     context: ./      

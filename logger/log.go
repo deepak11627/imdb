@@ -27,6 +27,7 @@ func NewLogger(c Config) Logger {
 	}
 }
 
+// TODO Following methods need fixing
 func (l *myLogger) Debug(msg string, vals ...interface{}) {
 	for _, v := range vals {
 		msg += "," + v.(string) + ","

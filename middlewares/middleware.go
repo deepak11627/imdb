@@ -11,9 +11,11 @@ type MiddleWare func(http.Handler) http.Handler
 // captureStats logs each incoming request
 func captureStats(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// capture stats
+		// TODO fix this to capture formatted stats
 		fmt.Println("Received a request")
 
 		next.ServeHTTP(w, r)
 	})
 }
+
+// TODO add more middle layers
