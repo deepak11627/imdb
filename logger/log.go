@@ -1,6 +1,8 @@
 package logger
 
 import (
+	"encoding/json"
+	"fmt"
 	"io"
 	"log"
 )
@@ -17,41 +19,55 @@ type myLogger struct {
 	logger *log.Logger
 }
 
+// Config is used to providing logging config
 type Config struct {
 	Output io.Writer
+	// Could have format as well as a config like json
 }
 
+// NewLogger return a Logger
 func NewLogger(c Config) Logger {
 	return &myLogger{
-		logger: log.New(c.Output, "Movie app:", log.LstdFlags),
+		logger: log.New(c.Output, "", log.LstdFlags),
 	}
 }
 
-// TODO Following methods need fixing
 func (l *myLogger) Debug(msg string, vals ...interface{}) {
-	for _, v := range vals {
-		msg += "," + v.(string) + ","
-	}
-	l.logger.Print(msg)
+	values := make(map[string]string, 0)
+	values["msg"] = msg
+	values["loglevel"] = "DEBUG"
+	values["values"] = fmt.Sprintf("%+v", vals)
+	b, _ := json.Marshal(values)
+	l.logger.Print(string(b))
+
 }
 
 func (l *myLogger) Info(msg string, vals ...interface{}) {
-	for _, v := range vals {
-		msg += "," + v.(string) + ","
-	}
-	l.logger.Print(msg)
+	values := make(map[string]string, 0)
+	values["msg"] = msg
+	values["loglevel"] = "INFO"
+	values["values"] = fmt.Sprintf("%+v", vals)
+	b, _ := json.Marshal(values)
+	l.logger.Print(string(b))
+
 }
 
 func (l *myLogger) Warn(msg string, vals ...interface{}) {
-	for _, v := range vals {
-		msg += "," + v.(string) + ","
-	}
-	l.logger.Print(msg)
+	values := make(map[string]string, 0)
+	values["msg"] = msg
+	values["loglevel"] = "WARN"
+	values["values"] = fmt.Sprintf("%+v", vals)
+	b, _ := json.Marshal(values)
+	l.logger.Print(string(b))
+
 }
 
 func (l *myLogger) Error(msg string, vals ...interface{}) {
-	for _, v := range vals {
-		msg += "," + v.(string) + ","
-	}
-	l.logger.Print(msg)
+	values := make(map[string]string, 0)
+	values["msg"] = msg
+	values["loglevel"] = "ERROR"
+	values["values"] = fmt.Sprintf("%+v", vals)
+	b, _ := json.Marshal(values)
+	l.logger.Print(string(b))
+
 }

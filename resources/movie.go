@@ -4,7 +4,7 @@ package resources
 type Movie struct {
 	ID       int      `json:"id"`
 	Name     string   `json:"name"`
-	Score    float32  `json:"imdb_score"`
+	Score    string   `json:"imdb_score"`
 	Genre    []string `json:"genre"`
 	Director string   `json:"director"`
 	//Popularity float32  `json:"99popularity"`
@@ -18,7 +18,7 @@ type Review struct {
 
 // MovieService represents Movie DB operations
 type MovieService interface {
-	CreateMovie(name, director string, genre []string, score float32) (int, error)
-	SaveMovie(ID int, name, director string, genre []string, score float32) error
+	CreateMovie(name, director string, genre []string, score string) (int, error)
+	SaveMovie(ID int, name, director string, genre []string, score string) error
 	GetMovie(id int) (*Movie, error)
 }

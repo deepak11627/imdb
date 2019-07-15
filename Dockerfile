@@ -1,3 +1,4 @@
+#!/bin/bash 
 FROM alpine
 RUN apk add --no-cache ca-certificates
 ADD ./imdb imdb

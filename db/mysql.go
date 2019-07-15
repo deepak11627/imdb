@@ -8,8 +8,8 @@ import (
 )
 
 type DatabaseService interface {
-	CreateMovie(name, director string, genre []string, score float32) (int, error)
-	SaveMovie(ID int, name, director string, genre []string, score float32) error
+	CreateMovie(name, director string, genre []string, score string) (int, error)
+	SaveMovie(ID int, name, director string, genre []string, score string) error
 	GetMovie(id int) (*resources.Movie, error)
 }
 
@@ -25,7 +25,7 @@ func NewDB(db *sql.DB) *Database {
 	}
 }
 
-func (d *Database) CreateMovie(name, director string, genre []string, score float32) (int, error) {
+func (d *Database) CreateMovie(name, director string, genre []string, score string) (int, error) {
 
 	stmt, err := d.db.Prepare("INSERT INTO `movie` (`name`, `director_name`, `imdb_score`) VALUES (?, ?, ?)")
 	if err != nil {
@@ -45,7 +45,7 @@ func (d *Database) CreateMovie(name, director string, genre []string, score floa
 	return int(lastInsertedID), nil
 }
 
-func (d *Database) SaveMovie(id int, name, director string, genre []string, score float32) error {
+func (d *Database) SaveMovie(id int, name, director string, genre []string, score string) error {
 	stmt, err := d.db.Prepare("UPDATE movie SET name=?, director_name=?, imdb_score=? WHERE id=?")
 	if err != nil {
 		return err

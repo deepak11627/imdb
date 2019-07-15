@@ -1,26 +1,25 @@
-version: "2"
+version: "2.1"
 services:
   mysql:
     image: mysql:5.7
     volumes:    
-      - ./db:/docker-entrypoint-initdb.d/1-init.sql
-    # healthcheck:
-    #   test: "mysql -uroot -ppass"
+      - ./db:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: "mysql -uroot -ppass"
     environment:
       - MYSQL_ROOT_PASSWORD=pass
       - MYSQL_DATABASE=imdb
     ports:
       - "3307:3306"
-    
-  # TODO use webapp in container
-  # webapp:
-  #   build:
-  #     context: ./      
-  #   depends_on:
-  #     mysql:
-  #       condition: service_healthy
-  #   ports:
-  #     - "8080:8080"
-  #   environment:
-  #   __MYSQL_DB_DSN: root:pass@tcp(mysql:3306)/shopify
+
+  webapp:
+    build:
+      context: ./      
+    depends_on:
+      mysql:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    environment:
+      - __MYSQL_DB_DSN=root:pass@tcp(mysql:3306)/imdb
   

@@ -3,7 +3,6 @@ package main
 import (
 	"database/sql"
 	"flag"
-	"fmt"
 	"log"
 	"os"
 
@@ -32,7 +31,7 @@ func main() {
 	// logger
 	logger := logger.NewLogger(logger.Config{Output: os.Stdout})
 
-	fmt.Println(os.Getenv("__MYSQL_DB_DSN"))
+	logger.Debug("__MYSQL_DB_DSN is ", os.Getenv("__MYSQL_DB_DSN"))
 	// Connect to Database
 	mysqlDB, err := sql.Open("mysql", os.Getenv("__MYSQL_DB_DSN"))
 	if err != nil {
