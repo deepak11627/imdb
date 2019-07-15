@@ -13,7 +13,8 @@ CREATE TABLE  IF NOT EXISTS `movie` (
 CREATE TABLE  IF NOT EXISTS `genre` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL DEFAULT '',
-  PRIMARY KEY (`id`)  
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `unique_genre` (`name`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 
 

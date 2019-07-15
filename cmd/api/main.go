@@ -46,7 +46,7 @@ func main() {
 	}
 
 	// Create new Service with required dependencies
-	s := handler.NewServer(addr, handler.NewHandler(db.NewDB(mysqlDB)))
+	s := handler.NewServer(addr, handler.NewHandler(db.NewDB(mysqlDB, logger), logger))
 	defer s.Close()
 
 	log.Fatal(s.Open())
